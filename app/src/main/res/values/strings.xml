@@ -4,7 +4,11 @@
 
     <string name="Title">WiFi Cracker</string>
 
+    <string name="ip_text">IP</string>
+    <string name="port_text">Port</string>
+    <string name="ip_hint">Input Remote Host IP</string>
+    <string name="port_hint">Input Remote Host Port</string>
     <string name="Connect">Connect</string>
-    <string name="Connect_hint">Input Remote Host IP</string>
+
 
 </resources>

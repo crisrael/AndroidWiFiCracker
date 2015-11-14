@@ -13,7 +13,8 @@
         android:layout_centerHorizontal="true"
         android:textSize="30dp"
         android:textStyle="bold"
-        android:textColor="#040000" />
+        android:textColor="#040000"
+        android:id="@+id/textView" />
 
     <Button
         android:id="@+id/connect_button"
@@ -21,20 +22,49 @@
         android:layout_height="wrap_content"
         android:text="@string/Connect"
         android:onClick="start_connection"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/port_input"
+        android:layout_centerHorizontal="true" />
+
+<!--    <TextView
+        android:id="@+id/ip_text"
+        android:text="@string/ip_text"
+        android:textSize="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="69dp" />
+        android:layout_alignBottom="@+id/ip_input" />
+
+    <TextView
+        android:id="@+id/port_text"
+        android:text="@string/port_text"
+        android:textSize="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="65dp"
+        android:layout_below="@+id/ip_text"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />-->
     
     <EditText
-        android:id="@+id/connect_input"
-        android:hint="@string/Connect_hint"
+        android:id="@+id/ip_input"
+        android:hint="@string/ip_hint"
+        android:inputType="phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="34dp"
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:id="@+id/port_input"
+        android:hint="@string/port_hint"
         android:inputType="number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/connect_button"
-        android:layout_toRightOf="@+id/connect_button"
-        android:layout_toEndOf="@+id/connect_button" />
+        android:layout_below="@+id/ip_input"
+        android:layout_centerHorizontal="true" />
+
 
 <!--    <android.support.design.widget.AppBarLayout android:layout_height="wrap_content"
         android:layout_width="match_parent" android:theme="@style/AppTheme.AppBarOverlay">
