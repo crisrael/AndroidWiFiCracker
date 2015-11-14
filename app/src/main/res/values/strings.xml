@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">AndroidWiFiCracker</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="Title">WiFi Cracker</string>
+
+    <string name="Connect">Connect</string>
+    <string name="Connect_hint">Input Remote Host IP</string>
+
+</resources>
