@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
         String ip = ip_input.getText().toString();
         if(port_input.getText().toString().equals("")) port = 0;
         else port = Integer.parseInt(port_input.getText().toString());
+        SSHAsyncTask ssh = new SSHAsyncTask(ip, port);
+        ssh.execute();
 
         connect(ip, port);
 /*        AlertDialog.Builder alert_builder = new AlertDialog.Builder(context).setMessage("ERROR");

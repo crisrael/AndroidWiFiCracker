@@ -24,4 +24,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.android.support:design:22.+'
+    compile 'com.jcraft:jsch:0.1.53'
 }
