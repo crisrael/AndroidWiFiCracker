@@ -25,6 +25,16 @@
         android:layout_below="@+id/port_input"
         android:layout_centerHorizontal="true" />
 
+    <Button
+        android:id="@+id/upload_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload"
+        android:onClick="upload_file"
+        android:layout_below="@+id/connect_button"
+        android:layout_alignLeft="@+id/connect_button"
+        android:layout_alignStart="@+id/connect_button" />
+
 <!--    <TextView
         android:id="@+id/ip_text"
         android:text="@string/ip_text"

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class MainActivity extends AppCompatActivity {
     final Context context = this;
@@ -73,5 +77,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void connect(String ip, int port){
 
+    }
+
+    public void upload_file(View v){
+        try{
+            FileInputStream input_stream = new FileInputStream(Environment.getExternalStorageDirectory().toString()+"/DCIM/test.cap");
+            FileUploader uploader = new FileUploader("http://www.test.com");
+            uploader.send(input_stream);
+        } catch(FileNotFoundException e){}
     }
 }
