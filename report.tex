@@ -1,0 +1,246 @@
+\documentclass[12pt, titlepage]{article}
+\usepackage[utf8]{inputenc}
+%\usepackage[document]{ragged2e}
+\usepackage{graphicx}
+\graphicspath{ {screenshots/} }
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{geometry}
+\geometry{margin=1in}
+%\usepackage{hyperref}
+
+\begin{titlepage}
+\title{Offloading Computation of WEP/WPA-PSK WiFi Password Cracking to a Cloud}
+\author{Iain Lee \\
+  {\tt ihlee@cpp.edu} \\ \\ And \\ \\
+  Crisrael Lucero \\
+  {\tt cmlucero@cpp.edu} \\ \\ \\ \\ \\
+  CS 599 - Advanced Information Security \\
+  Dr. Husain \\
+  California Polytechnic State University, Pomona
+  \date{December 11, 2015}}
+
+\end{titlepage}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\begin{abstract}
+Network Packets are formatted units of data that are sent from one endpoint to another. Packet Analyzing or Packet Sniffing is logging the packet traffic that passes over a wireless network. Aircrack-ng is a utility within the Aircrack suite of wireless network cracking tools. Malicious users can use a packet sniffer to collect packets being sent between an access point (e.g. WEP/WPA-PSK wireless router) and other endpoints (e.g. PCs) and then crack the password for that access point with Aircrack-ng. Aircrack-ng can perform a number of different attacks, such as brute force and dictionary attacks, but overall the computational power needed to use software such as Aircrack-ng on a mobile Android device is far too high. Normal attacks can take very long times based on the complexity and length of passwords. Our goal is to offload the work to a cloud server so that we can run cracks on a router and not use the computation power or resources of our mobile devices. The cloud server would also be able to utilize its massive amounts of resources to solve cracks faster than regular PCs and mobile phones.
+\end{abstract}
+
+\newpage
+
+\section{Introduction}
+The initial project proposal was to create an Android application that will sniff packets from a wireless access point and then upload the captured packets to a cloud server. The cloud server would then crack the password for that wireless access point.
+
+\subsection{Aircrack-ng Overview}
+The main tool we wanted to use was the Aircrack-ng WEP/WPA-PSK cracking program. Although Aircrack-ng is a suite of many wireless network tools (e.g. airodump-ng, airmon-ng, etc.), the specific tool we are focusing on happens to be named Aircrack-ng as well, which is not to be confused with the entire Aircrack-ng suite. The Aircrack-ng tool is used to crack WEP/WPA-PSK passwords if enough data packets have been collected from a wireless access point. To use the tool you need to pass in a packet capture file and a dictionary to perform the crack. There are two main dictionaries provided in our source folders: a brute force attack "list.txt" and a dictionary attack "password.lst". 
+
+\subsection{Packet Sniffing Overview}
+Packet Analyzers or Packet Sniffers can be eitehr software or hardware that logs the traffic of a network. We are concerned about the data packets passed over a wireless network because they are usually handled by a wireless access point. These access points are typically accessed with their WEP/WPA-PSK keys. There are many different applications created for rooted Android devices to allow their network cards to sniff and analyze packets. Some of these apps include Intercepter-ng, Android PCAP, and tPacketCapture. When a network adapter has been put into "Monitor" or "Promiscuous" mode, they can sniff packets on an access point they aren't connected to. Using this method, we plan to collect enough data packets to satisfy Aircrack-ng's tool.
+
+\subsection{Offloading to a Cloud}
+Cloud Computing allows users to store, manage, or compute data on a remote server rather than doing these tasks locally. Because the process of cracking passwords is computationally expensive and time consuming, it is not fathomable to run Aircrack-ng attacks on a mobile device. However, cloud computing technology allows for these attacks to be done remotely so a mobile devices resources would not be used up. Mobile devices also have extremely low computational prowess compared to cloud computing server clusters. Offloading the task of cracking WEP/WPA-PSK passwords onto a cloud server such as Amazon EC2 or IBM Bluemix allows for users to crack passwords at a much quicker speed without using their own local resources.
+
+\section{Implementation Approaches}
+This section will go over all the different implementations we have attempted for this project and reasoning as to why we pivoted into the final product. The following subsections may refer to documents or source code, all of which will be submitted. 
+
+\subsection{Android Application}
+The main goal of this project was to find if it was possible to offload the packet containing the authentication handshake to a remote device or cloud computing server so that the cracking can be performed with a higher performance machine.  While we had succeeded in this goal, our secondary goal was to be able to sniff packets and grab the handshake using an Android device.  Due to the fact that the Android devices on hand did not have the correct chipsets to allow for promiscuous/monitor mode we were unable to continue our goal of capturing a valid cap file to upload to the web browser.  
+\\
+Before these problems were found some effort had already been put into developing the application originally with some infrastructure coding to allow for an ssh connection to a remote device.  The ssh connection was originally meant to send command lines to the remote device to run aircrack on the uploaded cap file.  The valid cap file can be uploaded via http byte stream which was also implemented to the remote device.  However, due to the chipset problem this side of the project was put on hold and the direction was changed to develop a web-server that can be accessed through browser where any device that could capture valid cap files could upload the cap file and be sent back the cracked key via SMS.  
+
+\subsection{Server Configuration}
+Our approach required a server to run the cracks on. As a proof-of-concept approach we were using our own personal computers instead of a cloud server such as Amazon Elastic Compute Cloud because we did not want to break any terms of use agreements by performing malicious activities with Amazonӳ resources. We had a Cygwin server that allowed users to SSH/SCP into. We configured the server with RSA Authentication and held the public keys of users so that they can easily SSH/SCP into our server without having to enter a password every time. This would make the entire process of sending a file over from an Android device much more easier and a script would run to process the packet capture file being sent. However, we did not continue with this approach because of the problems we had on the Android side after packet collection. Regardless, we were able to test sending packets to the server and having Aircrack-ng run server-side. It was capable of cracking packets, but we could not get the Android application running in a timely manner. We ended up pivoting away from using a server to using a web application.
+\\
+Another document is inside of our Dropbox folder called ԒandomNotes.pdfԬ which contains various notes regarding SSH/SCP commands you would be sending and setting up RSA key exchange and authentication. It should be noted that these notes are not formatted in any specific way and only serves as a reference sheet used.
+
+\subsection{Web Application}
+We built a web application using the Meteor Framework, which is built on top of the Nodejs Framework. This web framework works exclusively in Javascript, which was a language we werenӴ comfortable with and Meteor was a framework we had little experience in. Regardless, we were able to set up the Meteor framework and could deploy the web application server locally. It should be noted that we were still deploying the application locally because this was a proof-of-concept. However, the Meteor framework is easily deployable on cloud services, and certain cloud service platforms such as IBM Bluemix have software built to handle Meteor applications easily such as Cloud Foundry.
+\\
+The Web Application allows the user to upload a captured packet file onto the application. Once the file is uploaded, a child process of Aircrack-ng is created and that instance will begin running cracks. Once the crack finishes, it utilizes a Twilio API that sends out a text message once the crack has finished. The Twilio API text messaging system is still under a lot of work; although it sends a text message correctly, it sometimes will send an improper text message even if the crack failed or it would send a text message far too early. The Meteor framework keeps server-side log files which update with the Aircrack-ng child process instances and you would be able to see the result of the cracks from there. 
+\\ 
+\begin{figure}
+\centering
+\includegraphics[width=0.4\textwidth]{image01}
+\caption{Uploading a captured packet file to our WiseCrack Web Application}
+\label{fig:01}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.4\textwidth]{image02}
+\caption{Test Messages received when the crack has finished}
+\label{fig:02}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=1\textwidth]{image03}
+\caption{Server-side Log files after Key is found}
+\label{fig:03}
+\end{figure}
+
+%%%%
+Now that we have changed to a Web Service, we can still crack with Android devices, but it is not an Android specific application. We can potentially port the application over to Android using a tool like Cordova, which is to be discussed in our Future Work section. The figures below show the process of uploading to our web application, text messages received, and the log files kept in our server when the child processes finish.
+
+\subsection{Laptop Configuration}
+Since we were unable to obtain an Android device with a valid chipset for promiscuous mode a laptop running Windows 7 was used instead.  Using both the host operating system and a virtual machine of Ubuntu we were able to perform monitor mode on our hotspot enabled devices and were able to grab the valid cap file with the authenticated handshake.  This cap file was then uploaded to the WiseCrack Meteor server which was able to find the key.  
+\\
+\begin{figure}[hb]
+\centering
+\includegraphics[width=0.5\textwidth]{image04}
+\caption{Laptop with Alfa Adapter}
+\end{figure}
+\\
+Above is a picture of our setup and the device we used to grab the cap file.  We used the Alfa adapter due to the fact that we knew it was a working adapter that had the correct chipset to run promiscuous/monitor mode.  To run our setup we used both the Host OS to find the mac address of the device we wanted to monitor and the Guest OS Ubuntu to run airmon-ng and airodump-ng. 
+\\
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{image05}
+\caption{sudo airmon-ng shows the available drivers for monitor mode}
+\end{figure}
+\\
+We see that using the command line airmon-ng it reveals that the Alfa adapter which contains realtek chipset is valid for monitor mode and detected by airmon in our Ubuntu vm.  Next we have to find which channel we want to sniff and itsҠmac address/bssid.  We do this by using the utility driver provided by ALFA.
+\\
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{image06}
+\caption{Galaxy Device is in Channel 6}
+\end{figure}
+
+\newpage
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{image07}
+\caption{Galaxy device BSSID- 60:21:C0:23:34:78}
+\end{figure}
+\\
+Now that we know the channel that the galaxy device we will be sniffing is in we use airmon to tell the adapter to start monitoring using interface wlan0(where our alfa adapter is located) on channel 6 with the command airmon-ng start wlan0 6.
+\\
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{image08}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{image09}
+\end{figure}
+\\
+You can see that monitor mode has now been enabled for wlan0 and the new interface is now called wlan0mon(mon refers to monitor mode).  
+\\
+We then use airodump-ng command: airodump-ng -c 6 --bssid 60:21:C0:23:34:78 -w psk wlan0mon.  What this command does is looks at channel 6 and looks at the packets with the mac/bssid address 60:21:C0:23:34:78 and writes them into the psk.cap file using the wlan0mon interface.  
+\\
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{image10}
+\caption{Packet Collection using Airodump-ng}
+\end{figure}
+\\
+The above displays the command we had just run with airodump-ng and you can see two BSSID/Mac addresses.  The first one is the access point or the android device that is currently hot-spotting as a router and the second line under Station is the mac address of another user currently using that access point.  It also displays the packets caught under Frames and the packets lost under Lost and the transfer rate under Rate. 
+\\
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{image11}
+\caption{Packet Collection Continued}
+\end{figure}
+\\
+Here we see another device has connected to the access point and this due to the fact that with more traffic going through the faster itӬl be to get the handshake.  Once the handshake is found a notice will appear at the top right as shown as WPA handshake: 60:21:C0:23:34:78.
+This terminal can now be closed and the directory that contains aircrack-ng will now contain the file that was written to.  In this case the fileӳ name was psk.  Grabbing this psk.cap file we will upload it into the web server: WiseCrack and have it crack the key.
+
+\section{Post-Presentation Progress}
+After the presentation we worked on getting the Google Nexus 7 to hopefully be able to go into Promiscuous/Monitor mode.  A huge problem we found along the way is that the version of the Nexus 7 we had obtained was the 2013 model which sadly has a Qualcomm chipset instead of the Broadcom chipset that was in the 2012 models.  The Broadcom driver allowed for promiscuous mode but the Qualcomm chipset does not which lead us to try and get our ALFA adapter to work on the Nexus 7.
+\\
+The first objective was to root the device which we managed to do.  However, a problem that we faced was that the Nexus 7 5.0.2 Lollipop build had a malfunction and the wifi adapter could no longer be detected which made doing things on the tablet extremely difficult.  Factory resetting did not fix the issue and eventually the problem was fixed by formatting/deleting all the data including the operating system and flashing a 5.1.0 lollipop build.  This problem created a huge setback in the progress of getting the ALFA adapter to work on the Nexus 7.
+\\
+Continuing on we then flashed Cyanogenmod 11(KitKat build) to the device using TWRP and googleӳ bootloader.  We then flashed on the Cyanogenmod rom the kali linux nethunter zip or KitKat.  Essentially what this does is run a linux terminal in Cyanogenmod and allies for penetration testing with its given api.  What we found was that on the Nexus 7 it was again unable to turn on the WiFi just like the 5.0.2 stock Lollipop Build.  Reasons are still unknown but it could be something to do with a bad kernel from what massive Googling has told us.  
+\\
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.25\textwidth]{image12}
+\caption{WiFi turned on but no signal}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.25\textwidth]{image13}
+\end{figure}
+\\
+
+Even with the WiFi detection turned on it canӴ find any available networks and it stays this way no matter if WiFi is set to on or off.  So we installed a new rom with Cyanogenmod 12(Lollipop) and flashed onto that Kali Linux Nethunter for Lollipop.  With this the WiFi was back to working again(builds with 5.1 or higher look like they have the kernel fix).  
+\\
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.25\textwidth]{image14}
+\caption{The three roms we now have installed}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.2\textwidth]{image15}
+\caption{Kali Linux Nethunter with WiFi}
+\end{figure}
+\\
+
+Above is just a picture of Kali Linux Nethunter and you can see the WiFi icon at the top right showing that the WiFi works in Lollipop Cyanogenmod/Kali.  From here we try and connect the ALFA adapter to the Nexus 7 shown below.  
+\\
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.2\textwidth]{image16}
+\caption{Setup of Nexus 7 and Alfa Adapter}
+\end{figure}
+\\
+Now we use Kali Nethunter to launch WiFite to see if it can detect the adapter and launch the interface as wlan1.
+\\
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.25\textwidth]{image17}
+\caption{Kali Launch Menu}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.25\textwidth]{image18}
+\caption{Unable to find device}
+\end{figure}
+\\
+
+Sadly we werenӴ able to get the Nexus 7 device to detect the ALFA driver.  We used different OTG cables to see if it was a cabling issue but from what our guess is that thereӳ not enough power going to the alfa adapter.  This can be remedied maybe with using a OTG y cable with a usb powered hub but we did not have the time to get a hub and test it out. 
+\\
+Although we were unable to get the adapter to be detected so unable to get a valid cap file to crack the key we did learn a lot about rooting devices and flashing new roms to them.  If we are able to get our hands on the Nexus 7 2012 version we can easily flash Cyanogenmod and Kali Linux Nethunter to it and root it to run monitor mode since it already has a viable internal WiFi chipset that can run promiscuous mode.  
+
+\section{Conclusion}
+We had succeeded in our primary goal and were able to offload a cap file that contains a authentic handshake of the access point we were trying to break into and have a web server process/break the encryption.  What this means is that we can use a more powerful machine such as a cloud computing server to do the brute force attacks and thus lower the amount of time needed to crack a wpa/wpa2 encryption without relying on the processing power of the device we are using to capture the cap file.  
+\\
+Our secondary goal was to capture valid cap files using an android device but this we were not successful at and even furthered this progression by using a Nexus 7 device.  Sadly as told earlier in the work because of the wrong model we still needed to use an external wifi adapter but the wifi adapter we had on at hand was unable to be detected by our Nexus 7 device and thus we were unable to go into monitor mode to capture the necessary cap files and handshake. 
+\\
+We were able to succeed in capturing the cap file by using a laptop instead and running a VM of Ubuntu.  Using the ALFA adapter the laptop was able to give sufficient power to it and we were able to access it and run airmon and monitor traffic on specific access points by using their channel and BSSID/Mac addresses.  Once we were able to monitor enough traffic and obtain the authentication handshake for WPA or WPA2 we uploaded the final cap file to the site which successfully cracked the key.  This shows that it is possible to offload the brute forcing of the key and so if needed a much stronger processing power network can be used to remotely crack a key.
+
+\section{Future Work}
+As discussed before, we plan to hopefully test using Apache Cordova to port our web application onto a native Android application. Cordova runs on top of the Nodejs framework as well and there are open source libraries that allow you to use Cordova for Meteor.
+\\
+We would also like to get the packet sniffing and capturing to work on Android correctly. With more time and the right Android devices, we could probably get this working. In this project, we just happened to run into a lot of problems with the Nexus 7 2013.  Hopefully we can get our hands on a Nexus 7 2012 model so we can do the same thing we originally planned on doing without needing to connect an external adapter; or we could get an external adapter that does not require as much power.
+
+\begin{thebibliography}{}
+
+\bibitem[1] {Tsitroulis:14}
+Tsitroulis, A., Lampoudis, D., Tsekleves, E.
+\newblock (2014).
+\newblock Exposing WPA2 Security Protocol Vulnerabilities.
+\newblock {\em International Journal of Information and Computer Security}, Vol. 6, No. 1.
+
+\bibitem[2] {Dongshen:11}
+Dongshen, Y. and Kai, C. 
+\newblock (2011).
+\newblock A research into the latent danger of WLAN.
+\newblock {\em ICCSE 2011}.
+
+\end{thebibliography}
+
+\end{document}
